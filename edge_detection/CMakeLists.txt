@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   geometry_msgs
   std_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -70,7 +71,7 @@ add_service_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  geometry_msgs std_msgs
+  geometry_msgs std_msgs sensor_msgs
 )
 
 ################################################
@@ -105,7 +106,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES edge_detection
-   CATKIN_DEPENDS geometry_msgs std_msgs message_runtime
+   CATKIN_DEPENDS geometry_msgs std_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -175,7 +176,8 @@ target_link_libraries(edge_detection_bin TARGET_NAME)
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  src/edge_detector_server.py src/edge_detector_directory_client.py
+  src/edge_detector_server.py src/edge_detector_directory_client.py 
+  src/dataconverter.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

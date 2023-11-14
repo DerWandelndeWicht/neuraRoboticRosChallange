@@ -7,22 +7,20 @@ import os
 from sensor_msgs.msg import Image
 
 from edge_detection.srv import edgeDetector, edgeDetectorResponse
-from data_converter import dataConverter
+from cv_bridge import CvBridge
+
+
+
 
 def detect_edge(req):
-    dc = dataConverter
-    #img_path = "/home/ros/Downloads/check.jpg"
-    #img = cv.imread(os.path.join(req.srcDir, req.fname))
-    data = req.data
-    img = dc.rosImage2img(data)
-    #img = np.reshape(data, (req.width, req.height, 3))
-    canny_mask = cv.Canny(img, 100,100)
-    
-    pos_pix = canny_mask[canny_mask > 100]
-    edge_image = np.zeros((req.width, req.height,3))
-    edge_image[:,:,1] = 255*canny_mask
-    
-    edge_image = list(np.array(edge_image.flatten(),dtype=np.uin8))
+    bridge = CvBridge()
+
+    img = bridge.imgmsg_to_cv2(req.img)
+    mask = cv.Canny(img, 200,200)
+    mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+    mask[:,:,0] *= 0
+    mask[:,:,2] *= 0
+    edge_image = bridge.cv2_to_imgmsg(mask, encoding="passthrough")
     return edgeDetectorResponse(edge_image)
 
 
