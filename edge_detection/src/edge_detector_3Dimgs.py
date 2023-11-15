@@ -2,6 +2,7 @@
 
 import cv2 as cv
 import numpy as np
+import ros_numpy
 import os
 from sensor_msgs.msg import Image, PointCloud
 from edge_detection.srv import edgeDetector, edgeDetectorResponse
@@ -27,12 +28,14 @@ def callback(rgb_img, depth_img):
         cv_depth_img = bridge.imgmsg_to_cv2(depth_img)
         depth_vals = cv_depth_img[edge_mask>=100]
         
-        print(edge_pxl.shape, np.expand_dims(depth_vals,1).shape)
-
-        depth_pointcload = PointCloud()
-        depth_pointcload.points = np.concatenate(
+        np_depth_array = np.concatenate(
             [edge_pxl, np.expand_dims(depth_vals,1)], axis=1)
-        pub.publish(bridge.cv2_to_imgmsg(depth_pointcload))
+
+        print(np_depth_array.shape)
+        depth_pc = ros_numpy.point_cloud2.array_to_pointcloud2(np_depth_array)
+        
+        
+        pub.publish(bridge.cv2_to_imgmsg(depth_pc))
 
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
