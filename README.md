@@ -8,10 +8,10 @@ catkin_make
 ```
 ## Packages
 Required packages:
-```
-numpy==1.20.3
-cv_bridge
-opencv-pyhon
+```console
+pip3 install opencv-pyhon &&
+pip3 install cv-bridge &&
+pip3 install numpy==1.20.3
 ```
 ## Tasks and results
 ### 1. Code Execution
