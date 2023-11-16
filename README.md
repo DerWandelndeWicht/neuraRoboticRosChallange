@@ -1,12 +1,22 @@
 # Vision Programming Challenge
  
 ## Introduction
-In this README I describe shortly my sollution to the given tasks. I solved the task using python and all scripts are located in "./edge_detection/src".
+In this README I describe shortly my sollution to the given tasks. I solved the task using python and all scripts are located in "./edge_detection/src". <br>
+To install the ros project clone the repository to the "&lt;ros_ws&gt;/src/ (in my case catkin_ws) and run 
+```console
+catkin_make
+```
 ## Packages
-
+Required packages:
+```
+numpy==1.20.3
+cv_bridge
+opencv-pyhon
+```
 ## Tasks and results
 ### 1. Code Execution
-To execute my solution run the following commands from the ros_workspace (here catkin_ws). 
+To execute my solution run the following commands from the catkin_workspace. <br>
+For the visualization make sure to include the the <em>robot</em> direcory.
 #### Terminal 1
 ```console
  roscore
