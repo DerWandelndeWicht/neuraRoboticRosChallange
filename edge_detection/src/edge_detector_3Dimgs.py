@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-import cv2 as cv
 import numpy as np
-import ros_numpy
-import os
 import message_filters
-import sys
 import rospy
 
-from std_msgs.msg import UInt32, UInt8, ColorRGBA
-from cv_bridge import CvBridge
-from sensor_msgs.msg import Image, PointCloud2, PointCloud, ChannelFloat32, PointField
-from edge_detection.srv import edgeDetector, edgeDetectorResponse
 from geometry_msgs.msg import Point32, Point, Pose, Quaternion, Vector3
-from visualization_msgs.msg import Marker, MarkerArray
+from sensor_msgs.msg import Image, PointCloud, ChannelFloat32
+from visualization_msgs.msg import Marker
+from std_msgs.msg import ColorRGBA
+from edge_detection.srv import edgeDetector
+from cv_bridge import CvBridge
+
+###
+# Rosnode for converting edge images from rosbag
+# into edge images and publish them with the depth
+# values to the topic 'edge_points' amd 'edge_marker'
+###
 
 def callback(rgb_img, depth_img):
     custom_pc = True
@@ -28,118 +30,53 @@ def callback(rgb_img, depth_img):
         edge_img_detector = rospy.ServiceProxy('canny_edge_detector', edgeDetector)
         ros_edge_img = edge_img_detector(rgb_img)
         # convert edge image into 
-        # print(depth_img.encoding)
         cv_edge_img = bridge.imgmsg_to_cv2(ros_edge_img.edgeImage)
         # edge_mask = cv.cvtColor(cv_edge_img, cv.COLOR_BGR2GRAY)
         # get pixels where green value of edge img > 100 -> edges
         edge_pxl  = np.transpose(np.array(np.where(cv_edge_img[:,:,1]>=100)))
         # convert depth image into cv2 image
         cv_depth_img = bridge.imgmsg_to_cv2(depth_img, desired_encoding="8UC1")
-        # print(cv_depth_img, np.max(cv_depth_img))
         # get corresponding depth values of edges
         depth_edges = np.array(cv_depth_img[cv_edge_img[:,:,1]>=100])
         # create 3d array with dims = [row, col, depth]
         np_depth_array = np.concatenate(
             [edge_pxl, np.expand_dims(depth_edges,1)], axis=1)
-
-        # cv.imshow("", cv_edge_img)
-        # cv.waitKey(0)
         # define values for publishing pc and markers
-        rgb_arr = np.ones((np_depth_array.shape[0],3))*255
-        lst = np.empty(shape=np_depth_array.shape[0], dtype=tuple)
+        # converting the xyz numpy array into point32 list
+        # create rgba list for pointer colors
+        # norm x,y,z in 0 to 1
         p32_lst = np.empty(shape=np_depth_array.shape[0], dtype=Point32)
         rgba_lst = np.empty(shape=np_depth_array.shape[0], dtype=ColorRGBA)
-        scaled_depth_array=np.empty(np_depth_array.shape)
-        #markerArray = np.empty(shape=np_depth_array.shape[0], dtype=Marker)
-        #print(cv_edge_img.shape[0]*cv_edge_img.shape[1], np_depth_array.shape)
         for i in range(np_depth_array.shape[0]):
-            lst[i]     = (np_depth_array[i,0]/(cv_edge_img.shape[0]/5),
-                          np_depth_array[i,1]/(cv_edge_img.shape[1]/5),
-                          np_depth_array[i,2]/(255/10))
-            p32_lst[i] = Point32(np_depth_array[i,0]/(cv_edge_img.shape[0]/1),
-                                 np_depth_array[i,1]/(cv_edge_img.shape[1]/1),
-                                 np_depth_array[i,2]/(255/1))
+            p32_lst[i] = Point32(np_depth_array[i,0]/(cv_edge_img.shape[0]),
+                                 np_depth_array[i,1]/(cv_edge_img.shape[1]),
+                                 np_depth_array[i,2]/(255))
             rgba_lst[i] = ColorRGBA(1.,0.,0.,0.75)
-            scaled_depth_array[i]= [np_depth_array[i,0]/cv_edge_img.shape[0],
-                                    np_depth_array[i,1]/cv_edge_img.shape[1],
-                                    np_depth_array[i,2]]
-
-        # pc = get_pointCloud2(header=rgb_img.header,
-        #                      img_shape=cv_edge_img.shape[:2],
-        #                      data = np.reshape(np_depth_array, 
-        #                             (np_depth_array.shape[0]*np_depth_array.shape[1])),
-        #                      custom_pc = True)
-        ############################################
-        if custom_pc:
-
-            pc1 = PointCloud()
-            pc1.header = rgb_img.header
-            pc1.header.frame_id = "root_link"
-
-            pc1.points = p32_lst
-            pc1.channels = [ChannelFloat32("x", np.float32(np_depth_array[:,0])),
-                            ChannelFloat32("y", np.float32(np_depth_array[:,1])),
-                            ChannelFloat32("2", np.float32(np_depth_array[:,2]))]
-
-
-            pc = PointCloud2()
-            pc.header = rgb_img.header
-            pc.header.frame_id = "root_link"
-            pc.height = 3
-            pc.width = np_depth_array.shape[0]
-            pc.fields = [PointField("x",0,7,1),
-                        PointField("y",4,7,1),
-                        PointField("z",8,7,1)]#
-                        #,PointField("rgb",16,7,1)]
-            pc.is_bigendian = False
-            pc.point_step = 8
-            pc.row_step   = len(depth_edges)
-            # np_depth_array[:,0] /= cv_edge_img.shape[0]
-            # np_depth_array[:,1] /= cv_edge_img.shape[1]
-            # np_depth_array[:,2] /= cv_edge_img.shape[2]
-            np_depth_array = scaled_depth_array
-            np_depth_array = np.reshape(np_depth_array, 
-                                        (np_depth_array.shape[0]*np_depth_array.shape[1]))
-            #print(np.max(np.uint8(np_depth_array)))
-            pc.data = np.array(np_depth_array).tobytes()
-            pub.publish(pc1)
-        else:
-            np_depth_array = np.array(lst,
-                                    dtype=[('x', np.int32), ('y', np.int32), ('z', np.float32)])
-            depth_pc = ros_numpy.point_cloud2.array_to_pointcloud2(np.transpose(np_depth_array))
-            depth_pc.header.frame_id = "root_link"
-            depth_pc.header.seq = rgb_img.header.seq
-            depth_pc.header.stamp = rgb_img.header.stamp
-            #depth_pc.is_dense = False
-            #print(depth_pc.data[2], depth_pc.data[4],depth_pc.data[6],depth_pc.data[8],depth_pc.data[10],depth_pc.data[12])
-            #print(depth_pc.fields)
-            pub.publish(depth_pc)
-        #####################################
-    
-        ####
+        # create pointcloud and publish it 
+        pc1 = PointCloud()
+        pc1.header = rgb_img.header
+        pc1.header.frame_id = "root_link"
+        pc1.points = p32_lst
+        pc1.channels = [ChannelFloat32("x", np.float32(np_depth_array[:,0])),
+                        ChannelFloat32("y", np.float32(np_depth_array[:,1])),
+                        ChannelFloat32("2", np.float32(np_depth_array[:,2]))]
+        pub.publish(pc1)
+  
+        # create Marker and publish it
         marker = Marker()
-        #marker.header.frame_id = rgb_img.header.frame_id
         marker.header.stamp = rgb_img.header.stamp
         marker.header.frame_id = "root_link"
         marker.type = 8 # 4 line strip #2 sphere
         marker.id = 0
         marker.points = p32_lst
         marker.colors = rgba_lst
-        #marker.color = ColorRGBA(244,1,0,1)
         marker.pose = Pose(Point(0,0,0), Quaternion(0,0,0,1))
-        marker.scale = Vector3(0.01,0.01,0.01)
+        marker.scale = Vector3(0.005,0.005,0.005)
         marker.mesh_use_embedded_materials = False
         marker_pub.publish(marker)
 
-
-
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
-
-
-def get_pointCloud2():
-    pass
-
 
 def detect_depth_edges():
     # initialize subsciber notes for rbg image and depth image
@@ -149,7 +86,6 @@ def detect_depth_edges():
     # use message filter to synchrinize callback
     ts = message_filters.TimeSynchronizer([img_sub, deph_sub], queue_size=100)
     ts.registerCallback(callback)
-
     rospy.spin()
 
 if __name__ == "__main__":

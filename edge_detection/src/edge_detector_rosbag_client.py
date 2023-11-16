@@ -6,8 +6,8 @@ from sensor_msgs.msg import Image
 
 ###
 # Service for recieving sensor Images from a rosbag
-# detect the edges with the service and publish it 
-# on an new topic afterwards
+# detect the edges with the service and publish them 
+# edge_image_publisher
 ###
 
 def callback(data):
