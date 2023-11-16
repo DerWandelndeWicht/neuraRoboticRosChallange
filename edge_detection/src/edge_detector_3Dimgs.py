@@ -126,7 +126,7 @@ def callback(rgb_img, depth_img):
         marker.points = p32_lst
         marker.colors = rgba_lst
         #marker.color = ColorRGBA(244,1,0,1)
-        marker.pose = Pose(Point(1,1,1), Quaternion(0,0,0,1))
+        marker.pose = Pose(Point(0,0,0), Quaternion(0,0,0,1))
         marker.scale = Vector3(0.01,0.01,0.01)
         marker.mesh_use_embedded_materials = False
         marker_pub.publish(marker)
