@@ -1,19 +1,19 @@
 # Vision Programming Challenge
  
-## 1. Introduction
+### 1. Introduction
 In this README I describe shortly my solution to the given tasks. I solved the task using python and all scripts are located in "./edge_detection/src". <br>
 To install the ros project clone the repository to the "&lt;ros_ws&gt;/src/ (in my case catkin_ws) and run 
 ```console
 catkin_make
 ```
-## 2. Packages
+### 2. Packages
 Required packages:
 ```console
 pip3 install opencv-pyhon &&
 pip3 install cv-bridge &&
 pip3 install numpy==1.20.3
 ```
-## Task and Results
+### Task and Results
 To solve the given task I created a ros package with a service that detects the edges in a given image with a canny edge detector of the opencv library. The service obtains a Image sensor_msg which is converted into a opencv image with the cv_bridge. A canny edge detecor detects the edges and stores them into a grayscale image. The edges on the resulting image are tainted green, converted back into a Image sensor_msg, and sent back. <br>
 The service is in: edge_detection edge_detector_server.py
 <br> 
