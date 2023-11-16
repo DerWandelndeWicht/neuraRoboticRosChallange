@@ -9,7 +9,7 @@ import rospy
 
 from std_msgs.msg import UInt32, UInt8, ColorRGBA
 from cv_bridge import CvBridge
-from sensor_msgs.msg import Image, PointCloud2, ChannelFloat32, PointField
+from sensor_msgs.msg import Image, PointCloud2, PointCloud, ChannelFloat32, PointField
 from edge_detection.srv import edgeDetector, edgeDetectorResponse
 from geometry_msgs.msg import Point32, Point, Pose, Quaternion, Vector3
 from visualization_msgs.msg import Marker, MarkerArray
@@ -19,7 +19,7 @@ def callback(rgb_img, depth_img):
     # rgb_image[sensor_msg/Image] and depth_image[sensor_msg/Image] obtained by subsciber
     bridge = CvBridge()
     # create publisher for point cloud and edge Marker
-    pub = rospy.Publisher('edge_points', PointCloud2, queue_size=100)
+    pub = rospy.Publisher('edge_points', PointCloud, queue_size=100)
     marker_pub = rospy.Publisher("/edge_marker", Marker, queue_size=100)
     # wait for edge detection service 
     rospy.wait_for_service('canny_edge_detector')
@@ -49,16 +49,20 @@ def callback(rgb_img, depth_img):
         lst = np.empty(shape=np_depth_array.shape[0], dtype=tuple)
         p32_lst = np.empty(shape=np_depth_array.shape[0], dtype=Point32)
         rgba_lst = np.empty(shape=np_depth_array.shape[0], dtype=ColorRGBA)
+        scaled_depth_array=np.empty(np_depth_array.shape)
         #markerArray = np.empty(shape=np_depth_array.shape[0], dtype=Marker)
         #print(cv_edge_img.shape[0]*cv_edge_img.shape[1], np_depth_array.shape)
         for i in range(np_depth_array.shape[0]):
-            lst[i]     = (np_depth_array[i,0]/cv_edge_img.shape[0],
-                          np_depth_array[i,1]/cv_edge_img.shape[1],
-                          np_depth_array[i,2]/255)
-            p32_lst[i] = Point32(np_depth_array[i,0]/cv_edge_img.shape[0],
-                                 np_depth_array[i,1]/cv_edge_img.shape[1],
-                                 np_depth_array[i,2]/255.)
+            lst[i]     = (np_depth_array[i,0]/(cv_edge_img.shape[0]/5),
+                          np_depth_array[i,1]/(cv_edge_img.shape[1]/5),
+                          np_depth_array[i,2]/(255/10))
+            p32_lst[i] = Point32(np_depth_array[i,0]/(cv_edge_img.shape[0]/1),
+                                 np_depth_array[i,1]/(cv_edge_img.shape[1]/1),
+                                 np_depth_array[i,2]/(255/1))
             rgba_lst[i] = ColorRGBA(1.,0.,0.,0.75)
+            scaled_depth_array[i]= [np_depth_array[i,0]/cv_edge_img.shape[0],
+                                    np_depth_array[i,1]/cv_edge_img.shape[1],
+                                    np_depth_array[i,2]]
 
         # pc = get_pointCloud2(header=rgb_img.header,
         #                      img_shape=cv_edge_img.shape[:2],
@@ -67,22 +71,38 @@ def callback(rgb_img, depth_img):
         #                      custom_pc = True)
         ############################################
         if custom_pc:
+
+            pc1 = PointCloud()
+            pc1.header = rgb_img.header
+            pc1.header.frame_id = "root_link"
+
+            pc1.points = p32_lst
+            pc1.channels = [ChannelFloat32("x", np.float32(np_depth_array[:,0])),
+                            ChannelFloat32("y", np.float32(np_depth_array[:,1])),
+                            ChannelFloat32("2", np.float32(np_depth_array[:,2]))]
+
+
             pc = PointCloud2()
             pc.header = rgb_img.header
             pc.header.frame_id = "root_link"
-            pc.height = 1
+            pc.height = 3
             pc.width = np_depth_array.shape[0]
             pc.fields = [PointField("x",0,7,1),
                         PointField("y",4,7,1),
                         PointField("z",8,7,1)]#
                         #,PointField("rgb",16,7,1)]
             pc.is_bigendian = False
-            pc.point_step = 3
+            pc.point_step = 8
             pc.row_step   = len(depth_edges)
+            # np_depth_array[:,0] /= cv_edge_img.shape[0]
+            # np_depth_array[:,1] /= cv_edge_img.shape[1]
+            # np_depth_array[:,2] /= cv_edge_img.shape[2]
+            np_depth_array = scaled_depth_array
             np_depth_array = np.reshape(np_depth_array, 
                                         (np_depth_array.shape[0]*np_depth_array.shape[1]))
-            pc.data = np.array(np_depth_array, dtype=np.uint8).tobytes()
-            pub.publish(pc)
+            #print(np.max(np.uint8(np_depth_array)))
+            pc.data = np.array(np_depth_array).tobytes()
+            pub.publish(pc1)
         else:
             np_depth_array = np.array(lst,
                                     dtype=[('x', np.int32), ('y', np.int32), ('z', np.float32)])
