@@ -45,19 +45,19 @@ For tasks using the rosbag start the rosbag.
 ```console
  rosbag play --clock -l <path to bagfile>
 ```
-#### Terminal 3.1.1: Edge Detector in Directory
+#### Terminal 4.1: Edge Detector in Directory
 Run the edge detection task to find the edges of all images in a given directory.
 The standard directory for the stored data is "&lt;catkin_ws&gt;/src/edge_detection_ros_challenge/edge_detection_ros/neuraRoboticRosChallange/edge_detection/data/". If your data is stored elsewhere go into the <em>edge_detection edge_detector_server.py</em> file and change the variable <strong>dir</strong> to the desired path. <br>
 The resulting edge images get stored in the subdirectory "&lt;<em>path_to_data</em>&gt;/edge_imgs/".
 ```console
  rosrun edge_detection edge_detector_directory_client.py
 ```
-#### Terminal 3.1.2: Edge Detector for Rosbag
+#### Terminal 4.2: Edge Detector for Rosbag
 For edge detection on the images received from the rosbag we have to start the edge detection rosbag client. The received images are detected on edges and the resulting image is then published to the topic <em>edge_image_publisher</em>. (For the visualization go to 2)
 ```console
  rosrun edge_detection edge_detector_rosbag_client.py 
 ```
-#### Terminal 3.1.3: Edge Detector for Rosbag with Depth Image
+#### Terminal 4.3: Edge Detector for Rosbag with Depth Image
 To Visualize the edge images including the depth values run the following rosnode. The rosbag images will be received and combined with the depth images. Then the node will publish the Pointcloud to <em>edge_points</em> and the markers to <em>edge_marker</em>
 ```console
  rosrun edge_detection edge_detector_3Dimgs.py
