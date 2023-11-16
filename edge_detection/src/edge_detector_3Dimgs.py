@@ -15,7 +15,7 @@ from geometry_msgs.msg import Point32, Point, Pose, Quaternion, Vector3
 from visualization_msgs.msg import Marker, MarkerArray
 
 def callback(rgb_img, depth_img):
-    custom_pc = False
+    custom_pc = True
     # rgb_image[sensor_msg/Image] and depth_image[sensor_msg/Image] obtained by subsciber
     bridge = CvBridge()
     # create publisher for point cloud and edge Marker
@@ -52,7 +52,9 @@ def callback(rgb_img, depth_img):
         #markerArray = np.empty(shape=np_depth_array.shape[0], dtype=Marker)
         #print(cv_edge_img.shape[0]*cv_edge_img.shape[1], np_depth_array.shape)
         for i in range(np_depth_array.shape[0]):
-            lst[i]     = (np_depth_array[i,0],np_depth_array[i,1],np_depth_array[i,2])
+            lst[i]     = (np_depth_array[i,0]/cv_edge_img.shape[0],
+                          np_depth_array[i,1]/cv_edge_img.shape[1],
+                          np_depth_array[i,2]/255)
             p32_lst[i] = Point32(np_depth_array[i,0]/cv_edge_img.shape[0],
                                  np_depth_array[i,1]/cv_edge_img.shape[1],
                                  np_depth_array[i,2]/255.)
@@ -67,14 +69,15 @@ def callback(rgb_img, depth_img):
         if custom_pc:
             pc = PointCloud2()
             pc.header = rgb_img.header
-            pc.header.frame_id = "base_link"
-            pc.height, pc.width = cv_edge_img.shape[:2]
-            pc.fields = [PointField("u",0,7,1),
-                        PointField("v",4,7,1),
-                        PointField("z",8,7,1),
-                        PointField("rgb",16,7,1)]
+            pc.header.frame_id = "root_link"
+            pc.height = 1
+            pc.width = np_depth_array.shape[0]
+            pc.fields = [PointField("x",0,7,1),
+                        PointField("y",4,7,1),
+                        PointField("z",8,7,1)]#
+                        #,PointField("rgb",16,7,1)]
             pc.is_bigendian = False
-            pc.point_step = 12
+            pc.point_step = 3
             pc.row_step   = len(depth_edges)
             np_depth_array = np.reshape(np_depth_array, 
                                         (np_depth_array.shape[0]*np_depth_array.shape[1]))
@@ -82,9 +85,9 @@ def callback(rgb_img, depth_img):
             pub.publish(pc)
         else:
             np_depth_array = np.array(lst,
-                                    dtype=[('u', np.int32), ('v', np.int32), ('z', np.float32)])
+                                    dtype=[('x', np.int32), ('y', np.int32), ('z', np.float32)])
             depth_pc = ros_numpy.point_cloud2.array_to_pointcloud2(np.transpose(np_depth_array))
-            depth_pc.header.frame_id = "base_link"
+            depth_pc.header.frame_id = "root_link"
             depth_pc.header.seq = rgb_img.header.seq
             depth_pc.header.stamp = rgb_img.header.stamp
             #depth_pc.is_dense = False
