@@ -26,7 +26,7 @@ The package contains multiple clients to make use of the service: <br>
 <br>
 The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can be to prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.<br>
 
-### 2. Code Execution
+### 3.1 Code Execution
 To execute my solution run the following commands from the catkin_workspace. <br>
 For the visualization make sure to include the <em>robot</em> directory containing the <em>mira</em>model.
 
@@ -63,9 +63,8 @@ To Visualize the edge images including the depth values run the following rosnod
  rosrun edge_detection edge_detector_3Dimgs.py
 ```
 
-### 3. Visualization
-#### 2.1 Visualization of the Rosbag images
-To visualize the edge images detected from the rosbag start rviz and subscibe to the topic.
+### 3.2 Visualization
+To visualize the edge images, Pointcloud and Markers start rviz and subscibe to the topic.
 ```console
  rosparam set /use_sim_time true &&
  source devel/setup.bash &&
