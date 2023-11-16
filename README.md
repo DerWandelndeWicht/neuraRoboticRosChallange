@@ -6,7 +6,7 @@ In this README I describe shortly my sollution to the given tasks. I solved the 
 
 ## Tasks and results
 ### 1. Code Execution
-To execute my solution run the following commands in the ros_workspace (e.g. catkin_ws). 
+To execute my solution run the following commands from the ros_workspace (here catkin_ws). 
 #### Terminal 1
 ```console
  roscore
@@ -24,8 +24,8 @@ For tasks using the rosbag start the rosbag.
 ```
 #### Terminal 4.1
 Run the edge detection task for finding edges of all images in a given directory.
-The standard directory for the stored data is "&lt;catkin_ws&gt;/src/edge_detection_ros_challenge/edge_detection_ros/neuraRoboticRosChallange/edge_detection/data/". To change this go into the <em>edge_detection edge_detector_server.py</em> file and change the variable <strong>dir</strong> to the desired path.
-The resulting edge images get stored into the sub directory "<em>&lt;path_to_data&gt;</em>/edge_imgs/".
+The standard directory for the stored data is "&lt;catkin_ws&gt;/src/edge_detection_ros_challenge/edge_detection_ros/neuraRoboticRosChallange/edge_detection/data/". If you data is stored elsewhere go into the <em>edge_detection edge_detector_server.py</em> file and change the variable <strong>dir</strong> to the desired path. <br>
+The resulting edge images get stored into the sub directory "&lt;<em>path_to_data</em>&gt;/edge_imgs/".
 ```console
  rosrun edge_detection edge_detector_directory_client.py
 ```
@@ -46,7 +46,7 @@ To visualize the edge images detected from the rosbag start rviz and subscibe to
 ```console
 rviz
 ```
- <stron>add</strong> -&gt; <stron>By topic</strong> -&gt;<stron>/edge_image_publisher</strong> -&gt;<stron>image</strong>.
+ <strong>add</strong> -&gt; <strong>By topic</strong> -&gt; <strong>/edge_image_publisher</strong> -&gt; <strong>image</strong>.
  
 ### 2.2 Visualization of the Pointcloud
 
