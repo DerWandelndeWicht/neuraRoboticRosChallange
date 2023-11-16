@@ -16,7 +16,7 @@ opencv-pyhon
 ## Tasks and results
 ### 1. Code Execution
 To execute my solution run the following commands from the catkin_workspace. <br>
-For the visualization make sure to include the the <em>robot</em> direcory.
+For the visualization make sure to include the the <em>robot</em> direcory containing the <em>mira</em>model.
 #### Terminal 1
 ```console
  roscore
