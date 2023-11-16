@@ -177,7 +177,6 @@ target_link_libraries(edge_detection_bin TARGET_NAME)
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/edge_detector_server.py src/edge_detector_directory_client.py 
-   src/tst_sub.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
