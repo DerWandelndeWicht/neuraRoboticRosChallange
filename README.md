@@ -25,6 +25,7 @@ The package contains multiple clients to make use of the service: <br>
 </ul> 
 <br>
 The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can be to prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.
+<br>
 ### 2. Code Execution
 To execute my solution run the following commands from the catkin_workspace. <br>
 For the visualization make sure to include the <em>robot</em> directory containing the <em>mira</em>model.
