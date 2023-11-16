@@ -28,6 +28,8 @@ def callback(data):
 
 def detect_rosbag_edges():
     # init subsciber node to subscribe to topic from rosbag
+    print("Starting Rosbage Edge Detection Client")
+    print("Publish Results to: /edge_image_publisher")
     rospy.init_node('bag_edge_detector', anonymous=True)
     rospy.Subscriber("/camera/color/image_raw", Image, callback)
     rospy.spin()

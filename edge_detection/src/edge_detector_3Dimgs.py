@@ -22,7 +22,7 @@ def callback(rgb_img, depth_img):
     bridge = CvBridge()
     # create publisher for point cloud and edge Marker
     pub = rospy.Publisher('edge_points', PointCloud, queue_size=100)
-    marker_pub = rospy.Publisher("/edge_marker", Marker, queue_size=100)
+    marker_pub = rospy.Publisher("edge_marker", Marker, queue_size=100)
     # wait for edge detection service 
     rospy.wait_for_service('canny_edge_detector')
     try:
@@ -80,6 +80,9 @@ def callback(rgb_img, depth_img):
 
 def detect_depth_edges():
     # initialize subsciber notes for rbg image and depth image
+    print("Starting Rosbage Edge Detection Client With Depth Values")
+    print("Publish Pointclould to: /edge_points")
+    print("Publish Marker to: /edge_marker")
     rospy.init_node('bag_edge_detector', anonymous=True)
     img_sub = message_filters.Subscriber("/camera/color/image_raw", Image)
     deph_sub = message_filters.Subscriber("/camera/depth/image_rect_raw", Image)

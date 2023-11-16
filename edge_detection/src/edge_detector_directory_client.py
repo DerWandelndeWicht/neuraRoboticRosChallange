@@ -16,9 +16,10 @@ from cv_bridge import CvBridge
 def get_dir_imgs():
     bridge = CvBridge()
     # init source directory and desination directory
-    dir = "./src/edge_detection_ros_challenge/edge_detection_ros/neuraRoboticRosChallange/edge_detection/data"
+    dir = "./src/neuraRoboticRosChallange/edge_detection/data"
     dst_dir = os.path.join(dir, "edge_imgs")
     os.makedirs(dst_dir, exist_ok=True)
+    print(f"Detect edges for Images in: {dir}")
     
     # iterate through every file in directory
     for i in range(0,len(os.listdir(dir))):

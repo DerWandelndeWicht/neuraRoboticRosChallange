@@ -45,7 +45,7 @@ To Visualize the edge images including the depth values run the following rosnod
 To visualize the edge images detected from the rosbag start rviz and subscibe to the topic.
 ```console
  rosparam set /use_sim_time true &&
- source devel/setup.bash && &&
+ source devel/setup.bash &&
  roslaunch mira_picker display.launch gripper_name:=robotiq2f_140 publish_joint_state:=false publish_robot_state:=false
 ```
 You can add the topics with
