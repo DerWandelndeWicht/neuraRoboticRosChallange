@@ -13,7 +13,7 @@ pip3 install opencv-pyhon &&
 pip3 install cv-bridge &&
 pip3 install numpy==1.20.3
 ```
-### Task and Results
+### 3 .Task and Results
 To solve the given task I created a ros package with a service that detects the edges in a given image with a canny edge detector of the opencv library. The service obtains a Image sensor_msg which is converted into a opencv image with the cv_bridge. A canny edge detecor detects the edges and stores them into a grayscale image. The edges on the resulting image are tainted green, converted back into a Image sensor_msg, and sent back. <br>
 The service is in: edge_detection edge_detector_server.py
 <br> 
@@ -24,11 +24,12 @@ The package contains multiple clients to make use of the service: <br>
  <li>edge_detector_3Dimgs.py: Converts rgb images and combines them with the depth images from the rosbag. Publish the results as a Pointcloud and Markers under a new topic.</li>
 </ul> 
 <br>
-The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can be to prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.
-<br>
+The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can be to prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.<br>
+
 ### 2. Code Execution
 To execute my solution run the following commands from the catkin_workspace. <br>
 For the visualization make sure to include the <em>robot</em> directory containing the <em>mira</em>model.
+
 #### Terminal 1
 ```console
  roscore
