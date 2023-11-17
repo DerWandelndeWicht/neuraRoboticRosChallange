@@ -24,11 +24,11 @@ The package contains multiple clients to make use of the service: <br>
  <li>edge_detector_3Dimgs.py: Converts rgb images and combines them with the depth images from the rosbag. Publish the results as a Pointcloud and Markers under a new topic.</li>
 </ul> 
 <br>
-The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can be to prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.<br>
+The solution I used for the problem has good solutions in most cases but also shows problems with very noisy images like in "./edge_detection/data/Image_2.png". To solve this problem one can prefilter the images either during the service or before sending them to the service. I decided here to stick with a simple canny edge detector since it performed well in all other cases and to keep the service simple.<br>
 
 ### 3.1 Code Execution
 To execute my solution run the following commands from the catkin_workspace. <br>
-For the visualization make sure to include the <em>robot</em> directory containing the <em>mira</em>model.
+For the visualization make sure to include the <em>"/robot"</em> directory containing the <em>mira</em> model.
 
 #### Terminal 1
 ```console
@@ -47,7 +47,7 @@ For tasks using the rosbag start the rosbag.
 ```
 #### Terminal 4.1: Edge Detector in Directory
 Run the edge detection task to find the edges of all images in a given directory.
-The standard directory for the stored data is "&lt;catkin_ws&gt;/src/edge_detection_ros_challenge/edge_detection_ros/neuraRoboticRosChallange/edge_detection/data/". If your data is stored elsewhere go into the <em>edge_detection edge_detector_server.py</em> file and change the variable <strong>dir</strong> to the desired path. <br>
+The standard directory for the stored data is "&lt;catkin_ws&gt;/src/neuraRoboticRosChallange/edge_detection/data/". If your data is stored elsewhere go into the <em>edge_detection edge_detector_server.py</em> file and change the variable <strong>dir</strong> to the desired path. <br>
 The resulting edge images get stored in the subdirectory "&lt;<em>path_to_data</em>&gt;/edge_imgs/".
 ```console
  rosrun edge_detection edge_detector_directory_client.py
